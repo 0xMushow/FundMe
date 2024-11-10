@@ -7,7 +7,7 @@ import {FundMe} from "../src/FundMe.sol";
 
 contract FundMeTest is Test {
 
-    FundMe private fundMe;
+    FundMe fundMe;
 
     function setUp() external {
         fundMe = new FundMe();
@@ -19,6 +19,11 @@ contract FundMeTest is Test {
 
     function testOwner() public view {
         assertEq(fundMe.i_owner(), address(this));
+    }
+
+    function testFund() public {
+        fundMe.fund{value: 5e18}();
+        assertEq(fundMe.addressToAmountFunded(address(this)), 5e18);
     }
 
 }
