@@ -6,7 +6,6 @@ import {Test} from "forge-std/Test.sol";
 import {FundMe} from "../src/FundMe.sol";
 
 contract FundMeTest is Test {
-
     FundMe fundMe;
 
     function setUp() external {
@@ -25,5 +24,4 @@ contract FundMeTest is Test {
         fundMe.fund{value: 5e18}();
         assertEq(fundMe.addressToAmountFunded(address(this)), 5e18);
     }
-
 }
