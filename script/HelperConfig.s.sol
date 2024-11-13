@@ -55,6 +55,8 @@ contract HelperConfig is Script {
         NetworkConfig memory anvilConfig = NetworkConfig({
             priceFeed : address(mockPriceFeed)
         });
+
+        return anvilConfig;
     }
 
 }
