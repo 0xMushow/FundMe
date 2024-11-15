@@ -8,25 +8,32 @@ import {DeployFundMe} from "../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
     FundMe fundMe;
-    address user = makeAddr("antoine");
+    address USER = makeAddr("antoine");
+    uint256 constant MINIMUM_USD = 5e18;
+    uint256 constant INITIAL_FUNDS = 100e18;
 
     function setUp() external {
         DeployFundMe deployFundMe = new DeployFundMe();
         fundMe = deployFundMe.run();
-        vm.deal(user, 100e18);
+        vm.deal(USER, INITIAL_FUNDS);
+    }
+
+    modifier funded() {
+        vm.prank(USER);
+        fundMe.fund{value: MINIMUM_USD}();
+        _;
     }
 
     function testMinimumUsd() public view {
-        assertEq(fundMe.MINIMUM_USD(), 5e18);
+        assertEq(fundMe.MINIMUM_USD(), MINIMUM_USD);
     }
 
     function testOwner() public view {
-        assertEq(fundMe.i_owner(), msg.sender);
+        assertEq(fundMe.getOwner(), msg.sender);
     }
 
-    function testFund() public {
-        fundMe.fund{value: 5e18}();
-        assertEq(fundMe.getAddressToAmountFunded(address(this)), 5e18);
+    function testFund() public funded {
+        assertEq(fundMe.getAddressToAmountFunded(USER), MINIMUM_USD);
     }
 
     function testFundFailWithLessThanMinimum() public {
@@ -34,27 +41,22 @@ contract FundMeTest is Test {
         fundMe.fund();
     }
 
-    function testFundUpdateDataStructure() public {
-        fundMe.fund{value: 5e18}();
-        uint256 amountFunded = fundMe.getAddressToAmountFunded(address(this));
-        assertEq(amountFunded, 5e18);
+    function testFundUpdateDataStructure() public funded {
+        uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
+        assertEq(amountFunded, MINIMUM_USD);
     }
 
-    function testWithdrawFunds () public {
-        vm.prank(user);
-        fundMe.fund{value: 5e18}();
-        vm.prank(fundMe.i_owner());
+    function testWithdrawFunds () public funded {
+        vm.prank(fundMe.getOwner());
         fundMe.withdraw();
-        assertEq(fundMe.getAddressToAmountFunded(user), 0);
+        assertEq(fundMe.getAddressToAmountFunded(USER), 0);
     }
 
     function getVersion() public view {
         assertEq(fundMe.getVersion(), 4);
     }
 
-    function testAddsFundersToArrayOfFunders() public {
-        vm.prank(user);
-        fundMe.fund{value: 5e18}();
-        assertEq(fundMe.getFunder(0), user);
+    function testAddsFundersToArrayOfFunders() public funded {
+        assertEq(fundMe.getFunder(0), USER);
     }
 }
