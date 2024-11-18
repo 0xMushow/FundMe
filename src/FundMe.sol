@@ -102,6 +102,10 @@ contract FundMe {
         return i_owner;
     }
 
+    function getPriceFeed() public view returns (address) {
+        return address(s_priceFeed);
+    }
+
 }
 
 // Concepts we didn't cover yet (will cover in later sections)
