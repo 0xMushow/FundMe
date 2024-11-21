@@ -1,4 +1,4 @@
-// SPDX-Licence-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.28;
 
@@ -6,7 +6,6 @@ import {MockV3Aggregator} from "../test/mocks/MockV3Aggregator.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract HelperConfig is Script {
-
     NetworkConfig public activeNetworkConfig;
 
     uint8 public constant DECIMALS = 8;
@@ -31,32 +30,34 @@ contract HelperConfig is Script {
 
     function getSepoliaEthConfig() public pure returns (NetworkConfig memory) {
         NetworkConfig memory sepoliaConfig = NetworkConfig({
-            priceFeed : 0x694AA1769357215DE4FAC081bf1f309aDC325306
+            priceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306
         });
         return sepoliaConfig;
     }
 
     function getMainnetEthConfig() public pure returns (NetworkConfig memory) {
         NetworkConfig memory mainnetConfig = NetworkConfig({
-            priceFeed : 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+            priceFeed: 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
         });
         return mainnetConfig;
     }
 
     function getAnvilConfig() public returns (NetworkConfig memory) {
-        if(activeNetworkConfig.priceFeed != address(0)) {
+        if (activeNetworkConfig.priceFeed != address(0)) {
             return activeNetworkConfig;
         }
 
         vm.startBroadcast();
-        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(
+            DECIMALS,
+            INITIAL_PRICE
+        );
         vm.stopBroadcast();
 
         NetworkConfig memory anvilConfig = NetworkConfig({
-            priceFeed : address(mockPriceFeed)
+            priceFeed: address(mockPriceFeed)
         });
 
         return anvilConfig;
     }
-
 }
